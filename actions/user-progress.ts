@@ -5,7 +5,8 @@ import { getCourseById, getUserProgress } from '@/db/queries'
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { auth, currentUser } from '@clerk/nextjs'
-import { userProgress } from "@/db/schema";
+import { userProgress, challengeProgress } from "@/db/schema";
+import { eq, and} from "drizzle-orm";
 
 export const upsertUserProgress = async (courseId: number) => {
     const { userId } = await auth()
@@ -44,4 +45,23 @@ export const upsertUserProgress = async (courseId: number) => {
         userName: user.firstName || "User",
         userImageSrc: user.imageUrl || "/mascot.svg",
     })
+}
+
+export const reduceHearts = async (challengeId: number) => {
+    const { userId } = await auth();
+    if(userId) throw new Error("Unauthorized")
+    const currentUserProgress = await getUserProgress();
+    //TODO: Get user subscription
+    
+    const existingChallengeProgress = await db.query.challengeProgress.findFirst({
+        where: and(
+        eq(challengeProgress.userId, userId),
+        eq(challengeProgress.challengeId, challengeId),
+    )});
+    
+    const isPractice = !!existingChallengeProgress;
+    if (isPractice) {
+        return {error:"practice"}
+    }
+
 }
