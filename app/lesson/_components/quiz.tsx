@@ -4,7 +4,7 @@ import Confetti from "react-confetti";
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
-import { challenges, challengeOptions } from "@/db/schema";
+import { challenges, challengeOptions, userSubscription } from "@/db/schema";
 import { Header } from "./header";
 import { QuestionBubble } from "./question-bubble";
 import { Challenge } from "./challenge";
@@ -24,7 +24,9 @@ type Props ={
     completed: boolean;
     challengeOptions: typeof challengeOptions.$inferSelect[];
   })[];
-  userSubscription: any
+    userSubscription: typeof userSubscription.$inferSelect & {
+      isActive: boolean;
+  } | null
 };
 
 export const Quiz = ({
